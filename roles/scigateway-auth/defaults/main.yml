@@ -1,0 +1,7 @@
+---
+
+scigateway_auth_user: scigateway-auth
+scigateway_auth_group: scigateway-auth
+scigateway_auth_home: /var/opt/scigateway-auth
+scigateway_auth_log: /var/log/scigateway-auth
+scigateway_auth_virtualenv: /opt/scigateway-auth

@@ -1,0 +1,14 @@
+{
+    "icat_url": "https://icat-dev.isis.stfc.ac.uk/icat",
+    "log_level": "DEBUG",
+    "log_location": "{{ scigateway_auth_log }}/logs.log",
+    "private_key_path": "{{ scigateway_auth_home }}/keys/jwt-key",
+    "public_key_path": "{{ scigateway_auth_home }}/keys/jwt-key.pub",
+    "access_token_valid_for": 30,
+    "refresh_token_valid_for": 10080,
+    "blacklist": [],
+    "admin_users": [],
+    "maintenance_config_path": "{{ scigateway_auth_home }}/maintenance/maintenance.json",
+    "scheduled_maintenance_config_path": "{{ scigateway_auth_home }}/maintenance/scheduled_maintenance.json",
+    "verify": true
+}

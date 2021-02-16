@@ -1,0 +1,89 @@
+---
+
+- name: "Create group"
+  group:
+    name: "{{ scigateway_auth_group }}"
+    state: present
+
+- name: "Create user"
+  user:
+    name: "{{ scigateway_auth_user }}"
+    group: "{{ scigateway_auth_group }}"
+    home: "{{ scigateway_auth_home }}"
+    shell: /sbin/nologin
+    system: yes
+
+- name: "Create home directory"
+  file:
+    path: "{{ scigateway_auth_home }}"
+    state: directory
+    owner: "{{ scigateway_auth_user }}"
+    group: "{{ scigateway_auth_group }}"
+    mode: 0755
+
+- name: "Create keys directory"
+  file:
+    path: "{{ scigateway_auth_home }}/keys"
+    state: directory
+    owner: "{{ scigateway_auth_user }}"
+    group: "{{ scigateway_auth_group }}"
+    mode: 0700
+
+- name: "Create JWT private key"
+  command:
+    cmd: openssl genrsa -out {{ scigateway_auth_home }}/keys/jwt-key
+    creates: "{{ scigateway_auth_home }}/keys/jwt-key"
+
+- name: "Create JWT public key"
+  command:
+    cmd: openssl rsa -in {{ scigateway_auth_home }}/keys/jwt-key -pubout -out {{ scigateway_auth_home }}/keys/jwt-key.pub
+    creates: "{{ scigateway_auth_home }}/keys/jwt-key.pub"
+
+- name: "Copy maintenance directory"
+  copy:
+    force: no
+    src: files/maintenance
+    dest: "{{ scigateway_auth_home }}/maintenance"
+    owner: "{{ scigateway_auth_user }}"
+    group: "{{ scigateway_auth_group }}"
+    mode: 0644
+    directory_mode: 0755
+
+- name: "Create log directory"
+  file:
+    path: "{{ scigateway_auth_log }}"
+    state: directory
+    owner: "{{ scigateway_auth_user }}"
+    group: "{{ scigateway_auth_group }}"
+    mode: 0755
+
+#- name: "Install into virtualenv"
+#  pip:
+#    name: "git+https://github.com/ral-facilities/scigateway-auth.git"
+#    state: latest
+#    virtualenv: "{{ scigateway_auth_virtualenv }}"
+#    virtualenv_python: python3
+
+- name: "Determine virtualenv site-packages directory"
+  shell: "{{ scigateway_auth_virtualenv | quote }}/bin/pip3 show scigateway_auth | awk '/^Location:/ { print $2 }'"
+  register: reg
+
+- name: "Set value of scigateway_auth_site_packages"
+  set_fact:
+    scigateway_auth_site_packages: "{{ reg.stdout }}"
+
+- name: "Create config.json from template"
+  template:
+    src: templates/config.json.j2
+    dest: "{{ scigateway_auth_site_packages }}/scigateway_auth/config.json"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Create apache conf fragment from template"
+  template:
+    src: templates/apache.conf.j2
+    dest: "/etc/httpd/conf.d/scigateway-auth.conf.fragment"
+    owner: root
+    group: root
+    mode: 0644
