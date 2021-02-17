@@ -1,0 +1,10 @@
+    WSGIPassAuthorization On
+
+    WSGIProcessGroup datagateway-api
+    WSGIDaemonProcess datagateway-api user={{ datagateway_api_user }} group={{ datagateway_api_group }} threads=1 python-home={{ datagateway_api_virtualenv }}
+    WSGIScriptAlias /datagateway-api {{ datagateway_api_site_packages }}/datagateway_api/wsgi.py process-group=datagateway-api
+
+    <Directory {{ datagateway_api_site_packages }}/datagateway_api>
+        AllowOverride None
+        Require all granted
+    </Directory>

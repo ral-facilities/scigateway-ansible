@@ -1,0 +1,7 @@
+---
+
+datagateway_api_user: datagateway-api
+datagateway_api_group: datagateway-api
+datagateway_api_home: /var/opt/datagateway-api
+datagateway_api_log: /var/log/datagateway-api
+datagateway_api_virtualenv: /opt/datagateway-api

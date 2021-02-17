@@ -1,0 +1,69 @@
+---
+
+- name: "Create group"
+  group:
+    name: "{{ datagateway_api_group }}"
+    state: present
+
+- name: "Create user"
+  user:
+    name: "{{ datagateway_api_user }}"
+    group: "{{ datagateway_api_group }}"
+    home: "{{ datagateway_api_home }}"
+    shell: /sbin/nologin
+    system: yes
+
+- name: "Create home directory"
+  file:
+    path: "{{ datagateway_api_home }}"
+    state: directory
+    owner: "{{ datagateway_api_user }}"
+    group: "{{ datagateway_api_group }}"
+    mode: 0755
+
+- name: "Create log directory"
+  file:
+    path: "{{ datagateway_api_log }}"
+    state: directory
+    owner: "{{ datagateway_api_user }}"
+    group: "{{ datagateway_api_group }}"
+    mode: 0755
+
+# Update pip first because older versions of pip will expect setup.py instead of pyproject.toml
+- name: "Update pip in virtualenv"
+  pip:
+    name: pip
+    state: latest
+    virtualenv: "{{ datagateway_api_virtualenv }}"
+    virtualenv_python: python3
+
+#- name: "Install into virtualenv"
+#  pip:
+#    name: "git+https://github.com/ral-facilities/datagateway-api.git"
+#    state: latest
+#    virtualenv: "{{ datagateway_api_virtualenv }}"
+#    virtualenv_python: python3
+
+- name: "Determine virtualenv site-packages directory"
+  shell: "{{ datagateway_api_virtualenv | quote }}/bin/pip3 show datagateway_api | awk '/^Location:/ { print $2 }'"
+  register: reg
+
+- name: "Set value of datagateway_api_site_packages"
+  set_fact:
+    datagateway_api_site_packages: "{{ reg.stdout }}"
+
+- name: "Create config.json from template"
+  template:
+    src: templates/config.json.j2
+    dest: "{{ datagateway_api_site_packages }}/datagateway_api/config.json"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: "Create apache conf fragment from template"
+  template:
+    src: templates/apache.conf.j2
+    dest: "/etc/httpd/conf.d/datagateway-api.conf.fragment"
+    owner: root
+    group: root
+    mode: 0644
