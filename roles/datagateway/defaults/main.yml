@@ -1,0 +1,6 @@
+---
+
+datagateway_plugins:
+  - "datagateway-dataview"
+  - "datagateway-download"
+  - "datagateway-search"

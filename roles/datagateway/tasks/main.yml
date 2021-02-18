@@ -1,0 +1,39 @@
+---
+
+- name: "Checkout repo"
+  git:
+    repo: "https://github.com/ral-facilities/datagateway.git"
+    version: master
+    dest: /root/datagateway
+
+- name: "Yarn install"
+  command:
+    cmd: yarn install
+    chdir: /root/datagateway
+
+- name: "Yarn build"
+  command:
+    cmd: yarn build
+    chdir: /root/datagateway/packages/{{ item }}
+  loop: "{{ datagateway_plugins }}"
+
+- name: "Create plugins directory"
+  file:
+    path: /var/www/html/plugins
+    state: directory
+
+- name: "Install to plugins directory"
+  copy:
+    src: /root/datagateway/packages/{{ item }}/build/
+    dest: /var/www/html/plugins/{{ item }}
+    remote_src: yes
+  loop: "{{ datagateway_plugins }}"
+
+- name: "Create *-settings.json from templates"
+  template:
+    src: templates/{{ item }}-settings.json.j2
+    dest: /var/www/html/{{ item }}-settings.json
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ datagateway_plugins }}"
