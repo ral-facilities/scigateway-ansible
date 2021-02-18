@@ -43,7 +43,7 @@
   copy:
     force: no
     src: files/maintenance
-    dest: "{{ scigateway_auth_home }}/maintenance"
+    dest: "{{ scigateway_auth_home }}"
     owner: "{{ scigateway_auth_user }}"
     group: "{{ scigateway_auth_group }}"
     mode: 0644
