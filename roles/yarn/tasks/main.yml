@@ -1,0 +1,7 @@
+---
+
+- name: "Install via npm"
+  npm:
+    name: yarn
+    state: latest
+    global: yes

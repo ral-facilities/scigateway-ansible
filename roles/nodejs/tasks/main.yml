@@ -1,0 +1,9 @@
+---
+
+- name: Add nodesource repository
+  shell: curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
+
+- name: Install nodejs from nodesource
+  package:
+    name: nodejs
+    state: latest

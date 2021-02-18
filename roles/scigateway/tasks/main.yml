@@ -1,0 +1,31 @@
+---
+
+- name: "Checkout repo"
+  git:
+    repo: "https://github.com/ral-facilities/scigateway.git"
+    version: master
+    dest: /root/scigateway
+
+- name: "Yarn install"
+  command:
+    cmd: yarn install
+    chdir: /root/scigateway
+
+- name: "Yarn build"
+  command:
+    cmd: yarn build
+    chdir: /root/scigateway
+
+- name: "Install content"
+  copy:
+    src: /root/scigateway/build/
+    dest: /var/www/html
+    remote_src: yes
+
+- name: "Create setting.json"
+  template:
+    src: templates/settings.json.j2
+    dest: /var/www/html/settings.json
+    owner: root
+    group: root
+    mode: 0644
