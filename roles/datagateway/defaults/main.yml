@@ -1,6 +1,12 @@
 ---
 
 datagateway_plugins:
-  - "datagateway-dataview"
-  - "datagateway-download"
-  - "datagateway-search"
+  - datagateway-dataview
+  - datagateway-download
+  - datagateway-search
+
+datagateway_version: master
+datagateway_download_api_url: "https://scigateway-preprod.esc.rl.ac.uk:8181/topcat"
+datagateway_ids_url: "https://scigateway-preprod.esc.rl.ac.uk:8181/ids"
+
+scigateway_plugins_dir: /srv/scigateway-plugins
