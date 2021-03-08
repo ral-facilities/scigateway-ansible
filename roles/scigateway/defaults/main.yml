@@ -1,0 +1,10 @@
+---
+
+scigateway_plugins:
+  - datagateway-dataview
+  - datagateway-download
+  - datagateway-search
+
+scigateway_version: snapshot
+scigateway_dir: /srv/scigateway
+scigateway_plugins_dir: /srv/scigateway-plugins

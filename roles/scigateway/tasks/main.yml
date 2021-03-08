@@ -1,31 +1,38 @@
 ---
 
-- name: "Checkout repo"
-  git:
-    repo: "https://github.com/ral-facilities/scigateway.git"
-    version: master
-    dest: /root/scigateway
+- name: "Create install directory"
+  file:
+    path: "{{ scigateway_dir }}"
+    state: directory
+    mode: 0755
 
-- name: "Yarn install"
-  command:
-    cmd: yarn install
-    chdir: /root/scigateway
+- name: "Create plugins directory"
+  file:
+    path: "{{ scigateway_plugins_dir }}"
+    state: directory
+    mode: 0755
 
-- name: "Yarn build"
-  command:
-    cmd: yarn build
-    chdir: /root/scigateway
+- name: "Download"
+  get_url:
+    url: "https://github.com/ral-facilities/scigateway/releases/download/{{ scigateway_version }}/scigateway-{{ scigateway_version }}.tar.gz"
+    dest: /root/scigateway-{{ scigateway_version }}.tar.gz
+    force: "{{ scigateway_version == 'snapshot' }}"
 
-- name: "Install content"
-  copy:
-    src: /root/scigateway/build/
-    dest: /var/www/html
+- name: "Unarchive"
+  unarchive:
+    src: /root/scigateway-{{ scigateway_version }}.tar.gz
+    dest: /root/
     remote_src: yes
+    extra_opts: --no-same-owner
 
-- name: "Create setting.json"
+- name: "Create settings.json"
   template:
     src: templates/settings.json.j2
-    dest: /var/www/html/settings.json
-    owner: root
-    group: root
+    dest: /root/scigateway-{{ scigateway_version }}/settings.json
     mode: 0644
+
+- name: "Install"
+  copy:
+    src: /root/scigateway-{{ scigateway_version }}/
+    dest: "{{ scigateway_dir }}"
+    remote_src: yes

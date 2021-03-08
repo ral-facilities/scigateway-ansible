@@ -5,12 +5,14 @@
     "showHelpPageButton": true
   },
   "plugins": [
+{% for item in scigateway_plugins %}
     {
-      "name": "demo_plugin",
-      "src": "http://localhost:5001/main.js",
-      "enable": false,
+      "name": "{{ item }}",
+      "src": "/plugins/{{ item }}/main.js",
+      "enable": true,
       "location": "main"
-    }
+    }{{ "," if not loop.last else "" }}
+{% endfor %}
   ],
   "help-tour-steps": [
     {
@@ -39,7 +41,7 @@
     }
   ],
   "ui-strings": "res/default.json",
-  "auth-provider": "jwt",
-  "authUrl": "http://localhost:3000",
+  "auth-provider": "icat",
+  "authUrl": "/api",
   "ga-tracking-id": "UA-XXXX-Y"
 }
