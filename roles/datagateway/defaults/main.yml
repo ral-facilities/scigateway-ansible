@@ -5,7 +5,7 @@ datagateway_plugins:
   - datagateway-download
   - datagateway-search
 
-datagateway_version: master
+datagateway_version: snapshot
 datagateway_download_api_url: "https://scigateway-preprod.esc.rl.ac.uk:8181/topcat"
 datagateway_ids_url: "https://scigateway-preprod.esc.rl.ac.uk:8181/ids"
 

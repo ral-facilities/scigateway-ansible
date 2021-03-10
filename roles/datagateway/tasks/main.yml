@@ -1,42 +1,30 @@
 ---
 
-- name: "Checkout repo"
-  git:
-    repo: "https://github.com/ral-facilities/datagateway.git"
-    version: "{{ datagateway_version }}"
-    force: yes
-    dest: /root/datagateway
-
-- name: "Yarn install"
-  command:
-    cmd: yarn install
-    chdir: /root/datagateway
-
-- name: "Create .env.production"
-  copy:
-    dest: /root/datagateway/packages/{{ item }}/.env.production
-    content: |
-      REACT_APP_DATAVIEW_BUILD_DIRECTORY=/plugins/datagateway-dataview/
-      REACT_APP_DOWNLOAD_BUILD_DIRECTORY=/plugins/datagateway-download/
-      REACT_APP_SEARCH_BUILD_DIRECTORY=/plugins/datagateway-search/
+- name: "Download"
+  get_url:
+    url: "https://github.com/ral-facilities/datagateway/releases/download/{{ datagateway_version }}/{{ item }}-{{ datagateway_version }}.tar.gz"
+    dest: /root/{{ item }}-{{ datagateway_version }}.tar.gz
+    force: "{{ datagateway_version == 'snapshot' }}"
   loop: "{{ datagateway_plugins }}"
 
-- name: "Yarn build"
-  command:
-    cmd: yarn build
-    chdir: /root/datagateway/packages/{{ item }}
+- name: "Unarchive"
+  unarchive:
+    src: /root/{{ item }}-{{ datagateway_version }}.tar.gz
+    dest: /root/
+    remote_src: yes
+    extra_opts: --no-same-owner
   loop: "{{ datagateway_plugins }}"
 
 - name: "Create *-settings.json from templates"
   template:
     src: templates/{{ item }}-settings.json.j2
-    dest: /root/datagateway/packages/{{ item }}/{{ item }}-settings.json
+    dest: /root/{{ item }}-{{ datagateway_version }}/{{ item }}-settings.json
     mode: 0644
   loop: "{{ datagateway_plugins }}"
 
 - name: "Install to Scigateway plugins directory"
   copy:
-    src: /root/datagateway/packages/{{ item }}/build/
+    src: /root/{{ item }}-{{ datagateway_version }}/
     dest: "{{ scigateway_plugins_dir }}/{{ item }}"
     remote_src: yes
   loop: "{{ datagateway_plugins }}"
