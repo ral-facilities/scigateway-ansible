@@ -36,3 +36,23 @@
     src: /root/scigateway-{{ scigateway_version }}/
     dest: "{{ scigateway_dir }}"
     remote_src: yes
+
+- name: "Create apache conf from template"
+  template:
+    src: templates/apache.conf.j2
+    dest: /etc/httpd/conf.d/scigateway.conf
+    mode: 0644
+
+- name: "Add scigateway-auth config to apache conf"
+  blockinfile:
+    marker: "# {mark} scigateway-auth conf"
+    block: "{{ lookup('file', '/etc/httpd/conf.d/scigateway-auth.conf.fragment') }}"
+    path: /etc/httpd/conf.d/scigateway.conf
+    insertbefore: "</VirtualHost>"
+
+- name: "Add datagateway-api config to apache conf"
+  blockinfile:
+    marker: "# {mark} datagateway-api conf"
+    block: "{{ lookup('file', '/etc/httpd/conf.d/datagateway-api.conf.fragment') }}"
+    path: /etc/httpd/conf.d/scigateway.conf
+    insertbefore: "</VirtualHost>"

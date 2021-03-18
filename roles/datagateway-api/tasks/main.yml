@@ -36,6 +36,7 @@
     state: latest
     virtualenv: "{{ datagateway_api_virtualenv }}"
     virtualenv_python: python3
+    virtualenv_command: /usr/local/bin/virtualenv
 
 - name: "Install into virtualenv"
   pip:

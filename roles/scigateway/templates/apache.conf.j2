@@ -1,0 +1,57 @@
+{% if scigateway_certificate_file is defined and scigateway_key_file is defined and scigateway_certificate_file|length and scigateway_key_file|length %}
+<VirtualHost *:80>
+  ServerName http://{{ ansible_fqdn }}
+  
+  RewriteEngine On
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]
+</VirtualHost>
+
+<VirtualHost *:443>
+  SSLEngine On
+  SLCertificateFile {{ scigateway_certificate_file }}
+  SSLCertificateKeyFile {{ scigateway_key_file }}
+  Header always set Strict-Transport-Security "max-age=63072000"
+
+{% else %}
+<VirtualHost *:80>
+{% endif %}
+  ServerName http://{{ ansible_fqdn }}
+  DocumentRoot /srv/scigateway
+
+  <Directory "/srv">
+      AllowOverride None
+      # Allow open access:
+      Require all granted
+  </Directory>
+
+  <FilesMatch ".(json)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+
+  <Directory />
+    RewriteEngine on
+
+    Options Indexes FollowSymLinks
+    AllowOverride None
+    Require all granted
+    # Don't rewrite files or directories
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+    # Rewrite everything else to index.html to allow html5 state links
+    RewriteRule ^ index.html [QSA,L]
+  </Directory>
+
+  Alias /plugins /srv/scigateway-plugins
+  <Directory /srv/scigateway-plugins>
+    RewriteEngine off
+
+    Options Indexes FollowSymLinks
+    AllowOverride None
+    Require all granted
+  </Directory>
+</VirtualHost>
+
+SSLProtocol             all -SSLv3 -TLSv1 -TLSv1.1
+SSLCipherSuite          ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+SSLHonorCipherOrder     off
