@@ -1,0 +1,13 @@
+- hosts: scigateway
+  become: true
+  roles:
+   - scigateway-auth
+   - datagateway-api
+   - scigateway
+   - datagateway
+  handlers:
+    - name: Restart apache
+      service:
+        name: httpd
+        state: restarted
+        

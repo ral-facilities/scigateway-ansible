@@ -42,6 +42,8 @@
     src: templates/apache.conf.j2
     dest: /etc/httpd/conf.d/scigateway.conf
     mode: 0644
+  notify:
+    - Restart apache
 
 - name: "Add scigateway-auth config to apache conf"
   blockinfile:
@@ -49,6 +51,8 @@
     block: "{{ lookup('file', '/etc/httpd/conf.d/scigateway-auth.conf.fragment') }}"
     path: /etc/httpd/conf.d/scigateway.conf
     insertbefore: "</VirtualHost>"
+  notify:
+    - Restart apache
 
 - name: "Add datagateway-api config to apache conf"
   blockinfile:
@@ -56,3 +60,10 @@
     block: "{{ lookup('file', '/etc/httpd/conf.d/datagateway-api.conf.fragment') }}"
     path: /etc/httpd/conf.d/scigateway.conf
     insertbefore: "</VirtualHost>"
+  notify:
+    - Restart apache
+
+- name: Start apache
+  service:
+    name: httpd
+    state: started

@@ -78,8 +78,14 @@
     executable: pip3
     state: present
 
+- name: Check if mod_wsgi has already been configured
+  stat:
+    path: /etc/httpd/conf.modules.d/00-wsgi.conf
+  register: stat_result
+
 - name: Configure mod_wsgi
   shell: /usr/local/bin/mod_wsgi-express install-module >> /etc/httpd/conf.modules.d/00-wsgi.conf
+  when: not stat_result.stat.exists
 
 # Update pip first because older versions of pip will expect setup.py instead of pyproject.toml
 - name: "Update pip in virtualenv"
@@ -112,6 +118,8 @@
     owner: root
     group: root
     mode: 0644
+  notify:
+  - Restart apache
 
 - name: "Create apache conf fragment from template"
   template:
@@ -120,3 +128,5 @@
     owner: root
     group: root
     mode: 0644
+  notify:
+    - Restart apache
