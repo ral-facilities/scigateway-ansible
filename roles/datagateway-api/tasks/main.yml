@@ -34,30 +34,11 @@
     name:
       - python3
       - python3-pip
-      - python3-devel
       - httpd
-      - httpd-devel
       - mod_ssl
       - openssl
-      - gcc
+      - python3-mod_wsgi
     state: present
-
-- name: Install virtualenv and mod_wsgi
-  pip:
-    name:
-     - virtualenv
-     - mod_wsgi
-    executable: pip3
-    state: present
-
-- name: Check if mod_wsgi has already been configured
-  stat:
-    path: /etc/httpd/conf.modules.d/00-wsgi.conf
-  register: stat_result
-
-- name: Configure mod_wsgi
-  shell: /usr/local/bin/mod_wsgi-express install-module >> /etc/httpd/conf.modules.d/00-wsgi.conf
-  when: not stat_result.stat.exists
 
 # Update pip first because older versions of pip will expect setup.py instead of pyproject.toml
 - name: "Update pip in virtualenv"
@@ -65,8 +46,7 @@
     name: pip
     state: latest
     virtualenv: "{{ datagateway_api_virtualenv }}"
-    virtualenv_python: python3
-    virtualenv_command: /usr/local/bin/virtualenv
+    virtualenv_command: python3 -m venv
 
 - name: "Install into virtualenv"
   pip:
