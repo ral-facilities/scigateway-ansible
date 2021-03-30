@@ -1,0 +1,10 @@
+---
+
+# payara (full) or payara-web (web profile)
+payara_type: payara-web
+
+payara_version: 5.2021.1
+payara_dir: /opt/payara5
+payara_user: glassfish
+payara_group: "{{ payara_user }}"
+payara_domain: domain1

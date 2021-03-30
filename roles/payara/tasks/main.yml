@@ -1,0 +1,110 @@
+---
+
+- name: "Install Java 8 (Debian / Ubuntu)"
+  package:
+    name: openjdk-8-jdk-headless
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: "Install Java 8 (RedHat / CentOS)"
+  package:
+    name: java-1.8.0-openjdk-headless
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: "Create payara user group"
+  group:
+    name: "{{ payara_group }}"
+    state: present
+
+- name: "Create payara user"
+  user:
+    name: "{{ payara_user }}"
+    createhome: true
+    group: "{{ payara_group }}"
+    shell: /bin/bash
+
+- name: "Create downloads directory"
+  file:
+    path: /home/{{ payara_user }}/downloads
+    state: directory
+    owner: "{{ payara_user }}"
+    group: "{{ payara_group }}"
+    mode: 0775
+
+- name: "Create install directory"
+  file:
+    path: /home/{{ payara_user }}/install
+    state: directory
+    owner: "{{ payara_user }}"
+    group: "{{ payara_group }}"
+    mode: 0775
+
+- name: "Create bin directory"
+  file:
+    path: /home/{{ payara_user }}/bin
+    state: directory
+    owner: "{{ payara_user }}"
+    group: "{{ payara_group }}"
+    mode: 0775
+
+- name: "Check if .bash_profile exists"
+  stat:
+    path: /home/{{ payara_user }}/.bash_profile
+  register: bashProfileResult
+
+- name: "Add path to payara executable to PATH variable in .bash_profile"
+  lineinfile:
+    path: /home/{{ payara_user }}/.bash_profile
+    line: "export PATH={{ payara_dir }}/bin:$PATH"
+    regexp: '^export PATH=[^:]*/payara[^:]*\/bin:\$PATH$'
+  when: bashProfileResult.stat.exists is defined and bashProfileResult.stat.exists == true
+
+- name: "Add path to payara executable to PATH variable in .profile"
+  lineinfile:
+    path: /home/{{ payara_user }}/.profile
+    line: "export PATH={{ payara_dir }}/bin:$PATH"
+    regexp: '^export PATH=[^:]*/payara[^:]*\/bin:\$PATH$'
+  when: bashProfileResult.stat.exists is defined and bashProfileResult.stat.exists == false
+
+- name: "Check payara installation"
+  stat:
+    path: "{{ payara_dir }}"
+  register: installationResult
+
+- name: "Install and setup Payara"
+  import_tasks: tasks/installation.yml
+  when: installationResult.stat.exists is defined and installationResult.stat.exists == false
+  notify: restart_payara
+
+- name: "Check payara installation"
+  stat:
+    path: /usr/share/java/mysql-connector-java.jar
+  register: mysqlResult
+
+- name: "Create symlink to mysql connector library"
+  file:
+    src: /usr/share/java/mysql-connector-java.jar
+    path: "{{ payara_dir }}/glassfish/domains/{{ payara_domain }}/lib/ext/mysql-connector-java.jar"
+    state: link
+    owner: "{{ payara_user }}"
+    group: "{{ payara_group }}"
+  when: mysqlResult.stat.exists is defined and mysqlResult.stat.exists == true
+  notify: restart_payara
+
+- name: "Install systemd service"
+  template:
+    src: templates/payara.service.j2
+    dest: '/etc/systemd/system/payara.service'
+    owner: root
+    group: root
+    mode: 0664
+  notify: systemd_daemon_reload
+
+- name: "Start and enable Payara"
+  service:
+    name: payara
+    state: started
+    enabled: yes
+
+- meta: flush_handlers

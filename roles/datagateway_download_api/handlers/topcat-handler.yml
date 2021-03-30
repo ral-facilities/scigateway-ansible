@@ -1,0 +1,8 @@
+---
+
+- name: "Re-install topcat"
+  command: "./setup -vv install"
+  args:
+    chdir: /home/{{ payara_user }}/install/topcat
+  become: true
+  become_user: "{{ payara_user }}"

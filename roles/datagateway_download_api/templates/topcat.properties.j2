@@ -1,0 +1,63 @@
+# List of Facility names
+# These names will be used by Topcat over the REST API;
+# each facility name in topcat.json must contain a match in this list,
+# and each name must be mapped to ICAT / IDS urls.
+# Edit these values to match your installation.
+
+facility.list = LILS
+
+facility.LILS.icatUrl = https://{{ icat_url }}:8181
+facility.LILS.idsUrl = https://{{ ids_url }}:8181
+
+# Download transport URLs
+# topcat.json can specify one or more download transport types for each facility, egs "https", "globus";
+# each may have a distinct download URL (prefix). To specify the download URL for a specific facility
+# and transport type, set an appropriate property as below.
+# Note that the transport type will be set in requests from the Topcat Javascript application,
+# but the URL to specify here should be the IDS url that will be used in the Java clients;
+# so it may be that the Javascript transport type https should be mapped here to an
+# internal http URL.
+# If the property is not defined, Topcat will use the facility's idsUrl by default.
+
+facility.LILS.downloadType.http = http://{{ ids_url }}:8080
+facility.LILS.downloadType.https = https://{{ ids_url }}:8181
+
+# enable send email
+mail.enable = false
+
+# The email subject. Tokens available are:
+# ${userName} - user username
+# ${email} - user email
+# ${facilityName} - the facility key (defined in frontend config)
+# ${preparedId} - the prepared Id of the download request
+# ${fileName} - the download name
+# ${size} - the download size
+# ${downloadUrl} - the download url
+mail.subject = TopCAT Download ${fileName} Ready
+
+# The email body message for https downloads. All subject tokens as above are available.
+mail.body.https = Hi ${userName},\n\nYour ${size} download ${fileName} has been prepared and is ready for download at ${downloadUrl}.\n\nThank you for using TopCAT.
+
+# The email body message for https downloads. All subject tokens as above are available.
+mail.body.globus = Hi ${userName}, \n\nYour ${size} Globus download ${fileName} is ready. Please see https:/example.com/#/globus-faq for more information on how to download using Globus.\n\nThank you for using TopCAT
+
+# The email body message for smartclient downloads. All subject tokens as above are available.
+mail.body.smartclient = Hi ${userName}, \n\nYour ${size} SmartClient download ${fileName} is ready. Please check your smartclient home directory for your files.\n\nThank you for using TopCAT
+
+# The email body message for SCARF downloads. All subject tokens as above are available.
+mail.body.scarf = Hi ${userName}, \n\nYour ${size} SCARF download ${fileName} is ready. Please see https:/example.com/#/scarf-faq for more information on how to download using SCARF.\n\nThank you for using TopCAT
+
+# The maximum number of datafiles for a getStatus call to the IDS for two level storage
+ids.getStatus.max = 100
+
+# The delay in seconds before polling starts. This delay is to gives the ids a chance to do its thing before we query it
+poll.delay = 600
+
+# The wait time in seconds between each poll to the IDS.
+poll.interval.wait = 600
+
+# A list of usernames that can use the admin REST API and Topcat admin user interface
+adminUserNames = {% if ansible_local.local.instantiations.authn_simple is defined and ansible_local.local.instantiations.authn_simple == 'true' %}simple/root {% endif %}{% if ansible_local.local.instantiations.authn_db is defined and ansible_local.local.instantiations.authn_db == 'true' %}db/root {% endif %}
+
+# The maximum number objects that can be cached before pruning will take place
+maxCacheSize = 100000

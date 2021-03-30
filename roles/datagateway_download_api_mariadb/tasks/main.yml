@@ -1,0 +1,17 @@
+---
+
+- name: "Create database for topcat"
+  mysql_db:
+    name: "{{ topcat_database }}"
+    state: present
+    login_user: root
+    login_password: "{{ db_root_password }}"
+
+- name: "Create user for topcat database"
+  mysql_user:
+    name: "{{ db_topcat_username }}"
+    password: "{{ db_topcat_password }}"
+    priv: "{{ topcat_database }}.*:ALL,GRANT"
+    state: present
+    login_user: root
+    login_password: "{{ db_root_password }}"

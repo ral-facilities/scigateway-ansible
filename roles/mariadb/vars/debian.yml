@@ -1,0 +1,9 @@
+---
+
+mariadb_daemon: mysql
+mariadb_config_dir: /etc/mysql/conf.d
+mariadb_pkgs:
+  - mariadb-server
+  - mariadb-client
+  - python3-pymysql
+  - libmysql-java

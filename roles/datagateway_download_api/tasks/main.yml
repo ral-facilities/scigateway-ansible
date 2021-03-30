@@ -1,0 +1,77 @@
+---
+
+- name: "Download topcat"
+  get_url:
+    url: https://github.com/ral-facilities/datagateway-download-api/releases/download/{{ topcat_version }}/topcat-{{ topcat_version }}-distro.zip
+    dest: /home/{{ payara_user }}/downloads
+    owner: "{{ payara_user }}"
+    group: "{{ payara_user }}"
+    mode: 0664
+
+- name: "Check topcat installation"
+  stat:
+    path: /home/{{ payara_user }}/install/topcat
+  register: installationResult
+
+- name: "Unarchive topcat if not installed"
+  unarchive:
+    src: /home/{{ payara_user }}/downloads/topcat-{{ topcat_version }}-distro.zip
+    dest: /home/{{ payara_user }}/install
+    remote_src: true
+    owner: "{{ payara_user }}"
+    group: "{{ payara_user }}"
+  when: installationResult.stat.exists is defined and installationResult.stat.exists == false
+
+- name: "Check topcat-setup.properties file existence"
+  local_action: stat path={{ role_path }}/files/topcat-setup.properties
+  become: false
+  register: setupPropertiesResult
+
+- name: "Configure topcat-setup.properties via copying"
+  copy:
+    src: files/setup.properties
+    dest: /home/{{ payara_user }}/install/topcat/topcat-setup.properties
+    owner: "{{ payara_user }}"
+    group: "{{ payara_user }}"
+    mode: 0600
+  when: setupPropertiesResult.stat.exists is defined and setupPropertiesResult.stat.exists == true
+  notify: install_topcat
+
+- name: "Configure topcat-setup.properties via templating"
+  import_tasks: tasks/create-setup-properties.yml
+  when: setupPropertiesResult.stat.exists is defined and setupPropertiesResult.stat.exists == false
+  notify: install_topcat
+
+- name: "Check topcat.properties file existence"
+  local_action: stat path={{ role_path }}/files/topcat.properties
+  become: false
+  register: runPropertiesResult
+
+- name: "Configure topcat.properties via copying"
+  copy:
+    src: files/topcat.properties
+    dest: /home/{{ payara_user }}/install/topcat/topcat.properties
+    owner: "{{ payara_user }}"
+    group: "{{ payara_user }}"
+    mode: 0664
+  when: runPropertiesResult.stat.exists is defined and runPropertiesResult.stat.exists == true
+  notify: install_topcat
+
+- name: "Configure topcat.properties via templating"
+  template:
+    src: templates/topcat.properties.j2
+    dest: /home/{{ payara_user }}/install/topcat/topcat.properties
+    owner: "{{ payara_user }}"
+    group: "{{ payara_user }}"
+    mode: 0664
+  when: runPropertiesResult.stat.exists is defined and runPropertiesResult.stat.exists == false
+  notify: install_topcat
+
+- name: "Configure topcat logback.xml"
+  copy:
+    src: files/logback.xml
+    dest: /home/{{ payara_user }}/install/topcat/logback.xml
+    owner: "{{ payara_user }}"
+    group: "{{ payara_user }}"
+    mode: 0664
+  notify: install_topcat
