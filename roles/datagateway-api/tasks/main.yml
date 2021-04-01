@@ -29,13 +29,24 @@
     group: "{{ datagateway_api_group }}"
     mode: 0755
 
+- name: Install python3, pip, apache & mod files
+  package:
+    name:
+      - python3
+      - python3-pip
+      - httpd
+      - mod_ssl
+      - openssl
+      - python3-mod_wsgi
+    state: present
+
 # Update pip first because older versions of pip will expect setup.py instead of pyproject.toml
 - name: "Update pip in virtualenv"
   pip:
     name: pip
     state: latest
     virtualenv: "{{ datagateway_api_virtualenv }}"
-    virtualenv_python: python3
+    virtualenv_command: python3 -m venv
 
 - name: "Install into virtualenv"
   pip:
@@ -59,11 +70,9 @@
     owner: root
     group: root
     mode: 0644
+  notify:
+    - Restart apache
 
 - name: "Create apache conf fragment from template"
-  template:
-    src: templates/apache.conf.j2
-    dest: "/etc/httpd/conf.d/datagateway-api.conf.fragment"
-    owner: root
-    group: root
-    mode: 0644
+  set_fact:
+    datagateway_api_apache_conf: "{{ lookup('template', 'templates/apache.conf.j2') }}"

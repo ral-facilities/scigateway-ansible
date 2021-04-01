@@ -36,3 +36,16 @@
     src: /root/scigateway-{{ scigateway_version }}/
     dest: "{{ scigateway_dir }}"
     remote_src: yes
+
+- name: "Create apache conf from template"
+  template:
+    src: templates/apache.conf.j2
+    dest: /etc/httpd/conf.d/scigateway.conf
+    mode: 0644
+  notify:
+    - Restart apache
+
+- name: Start apache
+  service:
+    name: httpd
+    state: started

@@ -5,3 +5,4 @@ datagateway_api_group: datagateway-api
 datagateway_api_home: /var/opt/datagateway-api
 datagateway_api_log: /var/log/datagateway-api
 datagateway_api_virtualenv: /opt/datagateway-api
+datagateway_api_icat_url: "https://scigateway-preprod.esc.rl.ac.uk:8181"
