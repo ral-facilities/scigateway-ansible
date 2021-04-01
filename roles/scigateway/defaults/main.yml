@@ -10,3 +10,5 @@ scigateway_dir: /srv/scigateway
 scigateway_plugins_dir: /srv/scigateway-plugins
 scigateway_certificate_file: ""
 scigateway_key_file: ""
+scigateway_settings_file: ""
+scigateway_strings_file: ""

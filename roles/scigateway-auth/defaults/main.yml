@@ -6,3 +6,4 @@ scigateway_auth_home: /var/opt/scigateway-auth
 scigateway_auth_log: /var/log/scigateway-auth
 scigateway_auth_virtualenv: /opt/scigateway-auth
 scigateway_auth_icat_url: "https://scigateway-preprod.esc.rl.ac.uk:8181/icat"
+scigateway_auth_config_file: ""

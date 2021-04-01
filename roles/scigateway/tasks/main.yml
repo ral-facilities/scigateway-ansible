@@ -25,11 +25,40 @@
     remote_src: yes
     extra_opts: --no-same-owner
 
+- name: "Check settings.json file existence"
+  local_action: stat path={{ scigateway_settings_file }}
+  register: settingsFileResult
+
+- name: "Check strings file existence"
+  local_action: stat path={{ scigateway_strings_file }}
+  register: stringsFileResult
+
+- name: "Copy settings.json"
+  copy:
+    src: "{{ scigateway_settings_file }}"
+    dest: /root/scigateway-{{ scigateway_version }}/settings.json
+    mode: 0644
+  when:
+   - settingsFileResult.stat.exists is defined
+   - settingsFileResult.stat.exists == true
+
 - name: "Create settings.json"
   template:
     src: templates/settings.json.j2
     dest: /root/scigateway-{{ scigateway_version }}/settings.json
     mode: 0644
+  when:
+   - settingsFileResult.stat.exists is defined
+   - settingsFileResult.stat.exists == false
+
+- name: "Copy default.json"
+  copy:
+    src: "{{ scigateway_strings_file }}"
+    dest: /root/scigateway-{{ scigateway_version }}/res/default.json
+    mode: 0644
+  when:
+   - stringsFileResult.stat.exists is defined
+   - stringsFileResult.stat.exists == true
 
 - name: "Install"
   copy:
@@ -62,6 +91,20 @@
     insertbefore: "</VirtualHost>"
   notify:
     - Restart apache
+
+- name: Open port 443
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "443"
+    jump: ACCEPT
+
+- name: Open port 80
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_port: "80"
+    jump: ACCEPT
 
 - name: Start apache
   service:
