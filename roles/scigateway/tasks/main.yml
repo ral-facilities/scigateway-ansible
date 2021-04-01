@@ -45,24 +45,6 @@
   notify:
     - Restart apache
 
-- name: "Add scigateway-auth config to apache conf"
-  blockinfile:
-    marker: "# {mark} scigateway-auth conf"
-    block: "{{ lookup('file', '/etc/httpd/conf.d/scigateway-auth.conf.fragment') }}"
-    path: /etc/httpd/conf.d/scigateway.conf
-    insertbefore: "</VirtualHost>"
-  notify:
-    - Restart apache
-
-- name: "Add datagateway-api config to apache conf"
-  blockinfile:
-    marker: "# {mark} datagateway-api conf"
-    block: "{{ lookup('file', '/etc/httpd/conf.d/datagateway-api.conf.fragment') }}"
-    path: /etc/httpd/conf.d/scigateway.conf
-    insertbefore: "</VirtualHost>"
-  notify:
-    - Restart apache
-
 - name: Start apache
   service:
     name: httpd

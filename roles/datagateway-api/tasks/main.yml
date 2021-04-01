@@ -74,11 +74,5 @@
     - Restart apache
 
 - name: "Create apache conf fragment from template"
-  template:
-    src: templates/apache.conf.j2
-    dest: "/etc/httpd/conf.d/datagateway-api.conf.fragment"
-    owner: root
-    group: root
-    mode: 0644
-  notify:
-    - Restart apache
+  set_fact:
+    datagateway_api_apache_conf: "{{ lookup('template', 'templates/apache.conf.j2') }}"
