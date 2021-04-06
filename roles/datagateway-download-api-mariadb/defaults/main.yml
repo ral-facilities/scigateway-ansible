@@ -1,0 +1,5 @@
+---
+
+topcat_database: topcat
+db_topcat_hostname: localhost
+db_topcat_username: topcat
