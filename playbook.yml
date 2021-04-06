@@ -1,13 +1,25 @@
+---
+
 - hosts: scigateway
   become: true
+  vars:
+    - payara_admin_password: passwd
+    - db_root_password: passwd
+    - topcat_database: topcat
+    - db_topcat_hostname: localhost
+    - db_topcat_username: topcat
+    - db_topcat_password: passwd
+    - icat_url: "https://scigateway-preprod.esc.rl.ac.uk:8181"
+    - ids_url: "https://scigateway-preprod.esc.rl.ac.uk:8181"
   roles:
-   - scigateway-auth
-   - datagateway-api
-   - scigateway
-   - datagateway
+    - datagateway-download-api-mariadb
+    - datagateway-download-api
+    - scigateway-auth
+    - datagateway-api
+    - scigateway
+    - datagateway
   handlers:
     - name: Restart apache
       service:
         name: httpd
         state: restarted
-        

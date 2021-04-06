@@ -1,7 +1,7 @@
 ---
 
 # payara (full) or payara-web (web profile)
-payara_type: payara-web
+payara_type: payara
 
 payara_version: 5.2021.1
 payara_dir: /opt/payara5

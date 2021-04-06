@@ -1,8 +1,8 @@
 ---
 
-- name: "Download topcat"
+- name: "Download datagateway-download-api"
   get_url:
-    url: https://github.com/ral-facilities/datagateway-download-api/releases/download/{{ topcat_version }}/topcat-{{ topcat_version }}-distro.zip
+    url: https://github.com/ral-facilities/datagateway-download-api/releases/download/{{ datagateway_download_api_version }}/topcat-{{ datagateway_download_api_version }}-distro.zip
     dest: /home/{{ payara_user }}/downloads
     owner: "{{ payara_user }}"
     group: "{{ payara_user }}"
@@ -15,7 +15,7 @@
 
 - name: "Unarchive topcat if not installed"
   unarchive:
-    src: /home/{{ payara_user }}/downloads/topcat-{{ topcat_version }}-distro.zip
+    src: /home/{{ payara_user }}/downloads/topcat-{{ datagateway_download_api_version }}-distro.zip
     dest: /home/{{ payara_user }}/install
     remote_src: true
     owner: "{{ payara_user }}"
@@ -75,3 +75,7 @@
     group: "{{ payara_user }}"
     mode: 0664
   notify: install_topcat
+
+- name: "Create apache conf fragment from template"
+  set_fact:
+    datagateway_download_api_apache_conf: "{{ lookup('template', 'templates/apache.conf.j2') }}"

@@ -2,7 +2,7 @@
 
 - name: install_topcat
   command:
-    cmd: "./setup -vv install"
+    cmd: "python setup -vv install"
     chdir: /home/{{ payara_user }}/install/topcat
   become: true
   become_user: "{{ payara_user }}"

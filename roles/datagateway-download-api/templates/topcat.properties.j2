@@ -6,8 +6,8 @@
 
 facility.list = LILS
 
-facility.LILS.icatUrl = https://{{ icat_url }}:8181
-facility.LILS.idsUrl = https://{{ ids_url }}:8181
+facility.LILS.icatUrl = {{ icat_url }}
+facility.LILS.idsUrl = {{ ids_url }}
 
 # Download transport URLs
 # topcat.json can specify one or more download transport types for each facility, egs "https", "globus";
@@ -19,8 +19,8 @@ facility.LILS.idsUrl = https://{{ ids_url }}:8181
 # internal http URL.
 # If the property is not defined, Topcat will use the facility's idsUrl by default.
 
-facility.LILS.downloadType.http = http://{{ ids_url }}:8080
-facility.LILS.downloadType.https = https://{{ ids_url }}:8181
+#facility.LILS.downloadType.http = http://example.com
+facility.LILS.downloadType.https = {{ ids_url }}
 
 # enable send email
 mail.enable = false
