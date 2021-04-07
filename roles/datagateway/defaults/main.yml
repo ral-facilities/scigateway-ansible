@@ -6,8 +6,8 @@ datagateway_plugins:
   - datagateway-search
 
 datagateway_version: snapshot
-datagateway_download_api_url: "https://scigateway-preprod.esc.rl.ac.uk:8181/topcat"
-datagateway_ids_url: "https://scigateway-preprod.esc.rl.ac.uk:8181/ids"
+datagateway_download_api_url: /topcat
+datagateway_ids_url: "{{ ids_url | default('https://example.com') }}/ids"
 
 datagateway-dataview_settings_file: ""
 datagateway-dataview_strings_file: ""
