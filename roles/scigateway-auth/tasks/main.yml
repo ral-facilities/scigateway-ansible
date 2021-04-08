@@ -94,6 +94,7 @@
 - name: "Check config.json file existence"
   local_action: stat path={{ scigateway_auth_config_file }}
   register: configFileResult
+  become: false
 
 - name: "Copy config.json"
   copy:

@@ -28,10 +28,12 @@
 - name: "Check settings.json file existence"
   local_action: stat path={{ scigateway_settings_file }}
   register: settingsFileResult
+  become: false
 
 - name: "Check strings file existence"
   local_action: stat path={{ scigateway_strings_file }}
   register: stringsFileResult
+  become: false
 
 - name: "Copy settings.json"
   copy:

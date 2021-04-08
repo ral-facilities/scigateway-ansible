@@ -19,11 +19,13 @@
   local_action: stat path='{{ vars[item + '_settings_file'] }}'
   loop: "{{ datagateway_plugins }}"
   register: settingsFileResults
+  become: false
 
 - name: "Check strings file existence"
   local_action: stat path='{{ vars[item + '_strings_file'] }}'
   loop: "{{ datagateway_plugins }}"
   register: stringsFileResults
+  become: false
 
 - name: "Copy *-settings.json files"
   copy:
