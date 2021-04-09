@@ -1,0 +1,67 @@
+---
+
+- include_vars: vars/redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include_vars: vars/debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: "Install mariadb packages"
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ mariadb_pkgs }}"
+
+- name: "Configure default storage engine"
+  copy:
+    src: files/storage-engine.cnf
+    dest: "{{ mariadb_config_dir }}/storage-engine.cnf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart_mariadb
+
+- name: "Configure default character set"
+  copy:
+    src: files/character-set.cnf
+    dest: "{{ mariadb_config_dir }}/character-set.cnf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart_mariadb
+
+- name: "Remove any mariadb specific conf as these defaults override our own"
+  lineinfile:
+    path: "{{ mariadb_config_dir }}/../my.cnf"
+    regexp: '\/mariadb\.conf\.d\/'
+    state: absent
+  notify: restart_mariadb
+
+- name: "Enable and start mariadb"
+  service:
+    name: "{{ mariadb_daemon }}"
+    state: started
+    enabled: yes
+
+- name: "Check whether the root account has a password"
+  command: mysql -u root -e exit
+  ignore_errors: yes
+  register: mysqlResult
+
+- name: "Run mysql_secure_installation"
+  command:
+    cmd: mysql_secure_installation
+    stdin: |
+      
+      Y
+      {{ db_root_password }}
+      {{ db_root_password }}
+      Y
+      Y
+      Y
+      Y
+  when: mysqlResult.rc == 0
+  notify: restart_mariadb
+
+# Flush handlers so that mariadb daemon has been restarted before any databases are created if config has changed
+- meta: flush_handlers

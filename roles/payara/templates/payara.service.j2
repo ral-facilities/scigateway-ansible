@@ -1,0 +1,14 @@
+[Unit]
+Description = Payara Server 5
+After = syslog.target network.target
+
+[Service]
+User = {{ payara_user }}
+Group = {{ payara_group }}
+PrivateTmp = true
+ExecStart = {{ payara_dir }}/bin/asadmin start-domain -w {{ payara_domain }}
+ExecStop = {{ payara_dir }}/bin/asadmin stop-domain {{ payara_domain }}
+Type = simple
+
+[Install]
+WantedBy = multi-user.target

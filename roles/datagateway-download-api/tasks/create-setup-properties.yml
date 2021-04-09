@@ -1,0 +1,43 @@
+---
+
+- name: "Create a stash directory for assembling configurations"
+  file:
+    path: /home/{{ payara_user }}/stash
+    state: directory
+    owner: "{{ payara_user }}"
+    group: "{{ payara_user }}"
+    mode: 0775
+
+- name: "Create a stash directory for topcat configs"
+  file:
+    path: /home/{{ payara_user }}/stash/topcat
+    state: directory
+    owner: "{{ payara_user }}"
+    group: "{{ payara_user }}"
+    mode: 0775
+
+- name: "Copy over {{ payara_user }} setup.properties"
+  template:
+    src: "{{ role_path }}/../payara/templates/setup.properties.j2"
+    dest: /home/{{ payara_user }}/stash/topcat/1-part
+    owner: "{{ payara_user }}"
+    group: "{{ payara_user }}"
+    mode: 0664
+
+- name: "Copy over topcat-setup.properties"
+  template:
+    src: templates/topcat-setup.properties.j2
+    dest: /home/{{ payara_user }}/stash/topcat/2-part
+    owner: "{{ payara_user }}"
+    group: "{{ payara_user }}"
+    mode: 0664
+
+- name: "Configure topcat-setup.properties by concatenation of files in the stash"
+  assemble:
+    src: /home/{{ payara_user }}/stash/topcat
+    dest: /home/{{ payara_user }}/install/topcat/topcat-setup.properties
+    delimiter: '\n'
+    owner: "{{ payara_user }}"
+    group: "{{ payara_user }}"
+    mode: 0600
+  notify: install_topcat

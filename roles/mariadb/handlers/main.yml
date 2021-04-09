@@ -1,0 +1,12 @@
+---
+
+- include_vars: vars/redhat.yml
+  when: ansible_os_family == "RedHat"
+
+- include_vars: vars/debian.yml
+  when: ansible_os_family == "Debian"
+
+- name: restart_mariadb
+  service:
+    name: "{{ mariadb_daemon }}"
+    state: restarted

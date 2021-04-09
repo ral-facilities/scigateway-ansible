@@ -1,0 +1,13 @@
+---
+
+# payara (full) or payara-web (web profile)
+payara_type: payara
+
+# generate a password by hashing a large random number
+payara_admin_password: "{{ (2**256) | random | hash('md5') }}"
+
+payara_version: 5.2021.1
+payara_dir: /opt/payara5
+payara_user: glassfish
+payara_group: "{{ payara_user }}"
+payara_domain: domain1

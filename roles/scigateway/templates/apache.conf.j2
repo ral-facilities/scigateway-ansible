@@ -24,6 +24,8 @@
 
 {% if datagateway_api_apache_conf is defined %}{{ datagateway_api_apache_conf }}{% endif %}
 
+{% if datagateway_download_api_apache_conf is defined %}{{ datagateway_download_api_apache_conf }}{% endif %}
+
   <Directory "/srv">
       AllowOverride None
       # Allow open access:

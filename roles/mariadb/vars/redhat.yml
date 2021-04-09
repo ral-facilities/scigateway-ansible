@@ -1,0 +1,9 @@
+---
+
+mariadb_daemon: mariadb
+mariadb_config_dir: /etc/my.cnf.d
+mariadb_pkgs:
+  - mariadb-server
+  - mariadb
+  - python2-PyMySQL
+  - mysql-connector-java

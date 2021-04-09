@@ -1,0 +1,58 @@
+---
+
+- name: "Download Payara"
+  get_url:
+    url: "https://search.maven.org/remotecontent?filepath=fish/payara/distributions/{{ payara_type }}/{{ payara_version }}/{{ payara_type }}-{{ payara_version }}.zip"
+    dest: /root/{{ payara_type }}-{{ payara_version }}.zip
+    mode: 0664
+
+- name: "Unarchive Payara"
+  unarchive:
+    src: /root/{{ payara_type }}-{{ payara_version }}.zip
+    dest: /root/
+    remote_src: true
+    owner: root
+    group: root
+
+- name: "Move Payara to installation directory"
+  command: "mv /root/payara5 {{ payara_dir }}"
+
+- name: "Make Payara domains directory owned by Payara user"
+  file:
+    path: "{{ payara_dir }}/glassfish/domains"
+    state: directory
+    recurse: yes
+    owner: "{{ payara_user }}"
+    group: "{{ payara_group }}"
+
+- name: "Make sure we are using Java 8 for Payara (Debian / Ubuntu)"
+  lineinfile:
+    path: "{{ payara_dir }}/glassfish/config/asenv.conf"
+    line: 'AS_JAVA="/usr/lib/jvm/java-1.8.0-openjdk-amd64"'
+    regexp: "^AS_JAVA="
+  when: ansible_os_family == "Debian"
+
+- name: "Make sure we are using Java 8 for Payara (RedHat / CentOS)"
+  lineinfile:
+    path: "{{ payara_dir }}/glassfish/config/asenv.conf"
+    line: 'AS_JAVA="/usr/lib/jvm/java-1.8.0-openjdk"'
+    regexp: "^AS_JAVA="
+  when: ansible_os_family == "RedHat"
+
+- name: "Download setup-glassfish.py"
+  get_url:
+    url: "https://raw.githubusercontent.com/icatproject/icat.utils/master/src/main/scripts/setup-glassfish.py"
+    dest: /home/{{ payara_user }}/setup-glassfish.py
+    owner: "{{ payara_user }}"
+    group: "{{ payara_group }}"
+    mode: 0775
+
+# We need to do "su -l" to make sure .bash_profile is sourced and asadmin is on the path
+- name: "Run setup-glassfish.py"
+  command: "su - {{ payara_user }} -c 'python /home/{{ payara_user }}/setup-glassfish.py {{ payara_domain }} 512m {{ payara_admin_password }}'"
+
+# Payara will be started by systemd in the next step, so we don't want it already running outside of systemd
+- name: "Stop Payara"
+  command: "{{ payara_dir }}/bin/asadmin stop-domain {{ payara_domain }}"
+  become: yes
+  become_user: "{{ payara_user }}"

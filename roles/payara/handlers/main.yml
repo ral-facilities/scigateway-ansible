@@ -1,0 +1,9 @@
+---
+
+- name: systemd_daemon_reload
+  command: systemctl daemon-reload
+
+- name: restart_payara
+  service:
+    name: payara
+    state: restarted

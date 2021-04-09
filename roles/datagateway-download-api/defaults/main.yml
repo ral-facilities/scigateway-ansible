@@ -1,0 +1,9 @@
+---
+
+datagateway_download_api_version: "2.4.8-SNAPSHOT"
+datagateway_download_api_icat_url: "{{ icat_url | default('https://example.com') }}/icat"
+datagateway_download_api_ids_url: "{{ ids_url | default('https://example.com') }}/ids"
+
+topcat_database: topcat
+db_topcat_hostname: localhost
+db_topcat_username: topcat

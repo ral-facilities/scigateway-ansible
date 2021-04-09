@@ -1,0 +1,28 @@
+# Derby Database
+!db.target = derby
+!db.driver = org.apache.derby.jdbc.ClientDataSource
+!db.url = jdbc:derby:{{ topcat_database }};create\\=true
+!db.username = {{ db_topcat_username }}
+!db.password = {{ db_topcat_password }}
+
+# Oracle Database
+!db.target = oracle
+!db.driver = oracle.jdbc.pool.OracleDataSource
+!db.url = jdbc:oracle:thin:@//{{ db_topcat_hostname }}:1521/{{ topcat_database }}
+!db.username = {{ db_topcat_username }}
+!db.password = {{ db_topcat_password }}
+
+# MySQL Database
+db.target = mysql
+db.driver = com.mysql.jdbc.jdbc2.optional.MysqlDataSource
+db.url = jdbc:mysql://{{ db_topcat_hostname }}:3306/{{ topcat_database }}
+db.username = {{ db_topcat_username }}
+db.password = {{ db_topcat_password }}
+
+# Email setup see http://docs.oracle.com/cd/E26576_01/doc.312/e24938/create-javamail-resource.htm#GSRFM00035
+mail.host = smtp.example.com
+mail.user = user@example.com
+mail.from = no-reply@example.com
+
+# See https://javamail.java.net/nonav/docs/api/ for list of properties
+mail.property = mail.smtp.port="25":mail.smtp.from="no-reply@example.com"
