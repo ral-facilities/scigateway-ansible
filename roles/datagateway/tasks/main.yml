@@ -15,12 +15,47 @@
     extra_opts: --no-same-owner
   loop: "{{ datagateway_plugins }}"
 
+- name: "Check settings.json file existence"
+  local_action: stat path='{{ vars[item + '_settings_file'] }}'
+  loop: "{{ datagateway_plugins }}"
+  register: settingsFileResults
+  become: false
+
+- name: "Check strings file existence"
+  local_action: stat path='{{ vars[item + '_strings_file'] }}'
+  loop: "{{ datagateway_plugins }}"
+  register: stringsFileResults
+  become: false
+
+- name: "Copy *-settings.json files"
+  copy:
+    src: "{{ item.stat.path }}"
+    dest: /root/{{ item.item }}-{{ datagateway_version }}/{{ item.item }}-settings.json
+    mode: 0644
+  with_items: "{{ settingsFileResults.results }}"
+  when:
+    - item.stat.exists is defined
+    - item.stat.exists == true
+
 - name: "Create *-settings.json from templates"
   template:
-    src: templates/{{ item }}-settings.json.j2
-    dest: /root/{{ item }}-{{ datagateway_version }}/{{ item }}-settings.json
+    src: templates/{{ item.item }}-settings.json.j2
+    dest: /root/{{ item.item }}-{{ datagateway_version }}/{{ item.item }}-settings.json
     mode: 0644
-  loop: "{{ datagateway_plugins }}"
+  with_items: "{{ settingsFileResults.results }}"
+  when:
+    - item.stat.exists is defined
+    - item.stat.exists == false
+
+- name: "Copy default.json"
+  copy:
+    src: "{{ item.stat.path }}"
+    dest: /root/{{ item.item }}-{{ datagateway_version }}/res/default.json
+    mode: 0644
+  with_items: "{{ stringsFileResults.results }}"
+  when:
+    - item.stat.exists is defined
+    - item.stat.exists == true
 
 - name: "Install to Scigateway plugins directory"
   copy:

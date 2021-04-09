@@ -63,6 +63,22 @@
   set_fact:
     datagateway_api_site_packages: "{{ reg.stdout }}"
 
+- name: "Check config.json file existence"
+  local_action: stat path={{ datagateway_api_config_file }}
+  register: configFileResult
+  become: false
+
+- name: "Copy config.json"
+  copy:
+    src: "{{ datagateway_api_config_file }}"
+    dest: "{{ datagateway_api_site_packages }}/datagateway_api/config.json"
+    mode: 0644
+  when:
+   - configFileResult.stat.exists is defined
+   - configFileResult.stat.exists == true
+  notify:
+  - Restart apache
+
 - name: "Create config.json from template"
   template:
     src: templates/config.json.j2
@@ -70,6 +86,9 @@
     owner: root
     group: root
     mode: 0644
+  when:
+   - configFileResult.stat.exists is defined
+   - configFileResult.stat.exists == false
   notify:
     - Restart apache
 
