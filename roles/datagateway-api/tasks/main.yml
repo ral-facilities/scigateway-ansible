@@ -29,11 +29,13 @@
     group: "{{ datagateway_api_group }}"
     mode: 0755
 
-- name: Install python3, pip, apache & mod files
+- name: Install python3, pip, git, apache & mod files
   package:
     name:
       - python3
       - python3-pip
+      - python-setuptools
+      - git
       - httpd
       - mod_ssl
       - openssl
