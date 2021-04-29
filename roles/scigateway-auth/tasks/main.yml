@@ -84,6 +84,8 @@
     state: latest
     virtualenv: "{{ scigateway_auth_virtualenv }}"
     virtualenv_python: python3
+  notify:
+  - Restart apache
 
 - name: "Determine virtualenv site-packages directory"
   shell: "{{ scigateway_auth_virtualenv | quote }}/bin/pip3 show scigateway_auth | awk '/^Location:/ { print $2 }'"

@@ -56,6 +56,8 @@
     state: latest
     virtualenv: "{{ datagateway_api_virtualenv }}"
     virtualenv_python: python3
+  notify:
+  - Restart apache
 
 - name: "Determine virtualenv site-packages directory"
   shell: "{{ datagateway_api_virtualenv | quote }}/bin/pip3 show datagateway_api | awk '/^Location:/ { print $2 }'"
