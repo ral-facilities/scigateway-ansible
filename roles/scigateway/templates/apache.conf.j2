@@ -9,6 +9,7 @@
 <VirtualHost *:443>
   SSLEngine On
   SSLCertificateFile {{ scigateway_certificate_file }}
+  SSLCertificateChainFile {{ scigateway_certificate_bundle_file if scigateway_certificate_bundle_file is defined and scigateway_certificate_bundle_file|length else scigateway_certificate_file }}
   SSLCertificateKeyFile {{ scigateway_key_file }}
   Header always set Strict-Transport-Security "max-age=63072000"
 
