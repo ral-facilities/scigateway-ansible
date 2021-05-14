@@ -76,6 +76,15 @@
   notify:
     - Restart apache
 
+- name: Disable TRACE HTTP method
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: "^TraceEnable"
+    line: "TraceEnable Off"
+    state: present
+  notify:
+    - Restart apache
+
 - name: Open port 443
   ansible.builtin.iptables:
     chain: INPUT
