@@ -20,6 +20,10 @@
   ServerAlias *
 
   DocumentRoot {{ scigateway_dir }}
+  
+  # compress all files except images
+  SetOutputFilter DEFLATE
+  SetEnvIfNoCase Request_URI "\.(?:gif|jpe?g|png)$" no-gzip
 
   WSGIPassAuthorization On
 
