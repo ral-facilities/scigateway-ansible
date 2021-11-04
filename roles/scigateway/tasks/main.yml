@@ -53,6 +53,12 @@
    - settingsFileResult.stat.exists is defined
    - settingsFileResult.stat.exists == false
 
+- name: "Edit settings.json to allow for cache busting of plugins"
+  replace:
+    path: /root/scigateway-{{ scigateway_version }}/settings.json
+    regexp: '(^\s*"src": *".*)(\.js",\s?)'
+    replace: '\1.{{ansible_date_time.epoch}}\2'
+
 - name: "Copy default.json"
   copy:
     src: "{{ scigateway_strings_file }}"

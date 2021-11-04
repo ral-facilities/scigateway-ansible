@@ -63,3 +63,10 @@
     dest: "{{ scigateway_plugins_dir }}/{{ item }}"
     remote_src: yes
   loop: "{{ datagateway_plugins }}"
+
+- name: "Rename main.js files to enable cache busting"
+  copy:
+    src: "{{ scigateway_plugins_dir }}/{{ item }}/main.js"
+    dest: "{{ scigateway_plugins_dir }}/{{ item }}/main.{{ansible_date_time.epoch}}.js"
+    remote_src: yes
+  loop: "{{ datagateway_plugins }}"

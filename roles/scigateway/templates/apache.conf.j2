@@ -33,7 +33,7 @@
 
 {% if datagateway_download_api_apache_conf is defined %}{{ datagateway_download_api_apache_conf }}{% endif %}
 
-  <FilesMatch ".(json)$">
+  <FilesMatch ".(json|html)$">
     Header set Cache-Control "no-cache"
   </FilesMatch>
 
