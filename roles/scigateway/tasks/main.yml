@@ -35,6 +35,20 @@
   register: stringsFileResult
   become: false
 
+- name: "Check favicon existence"
+  local_action: stat path={{ scigateway_favicon }}
+  register: faviconResult
+  become: false
+  when:
+    - scigateway_favicon is defined
+
+- name: "Check logo existence"
+  local_action: stat path={{ scigateway_logo }}
+  register: logoResult
+  become: false
+  when:
+    - scigateway_logo is defined
+
 - name: "Copy settings.json"
   copy:
     src: "{{ scigateway_settings_file }}"
@@ -67,6 +81,40 @@
   when:
    - stringsFileResult.stat.exists is defined
    - stringsFileResult.stat.exists == true
+
+- name: "Edit title tag"
+  replace:
+    path: /root/scigateway-{{ scigateway_version }}/index.html
+    after: '<title>'
+    before: '</title>'
+    regexp: '.*'
+    replace: "{{ scigateway_title }}"
+
+- name: "Replace favicon"
+  copy:
+    src: "{{ scigateway_favicon }}"
+    dest: /root/scigateway-{{ scigateway_version }}/favicon.ico
+    mode: 0644
+  when:
+   - scigateway_favicon is defined
+   - faviconResult.stat.exists is defined
+   - faviconResult.stat.exists == true
+
+- name: "Copy logo"
+  copy:
+    src: "{{ scigateway_logo }}"
+    dest: /root/scigateway-{{ scigateway_version }}
+    mode: 0644
+  when:
+   - scigateway_logo is defined
+   - logoResult.stat.exists is defined
+   - logoResult.stat.exists == true
+
+- name: "Edit manifest.json"
+  replace:
+    path: /root/scigateway-{{ scigateway_version }}/manifest.json
+    regexp: '(^\s*"(?:short_name|name)": ").*(",?)$'
+    replace: '\1{{ scigateway_title }}\2'
 
 - name: "Install"
   copy:
