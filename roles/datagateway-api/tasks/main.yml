@@ -52,8 +52,8 @@
 
 - name: "Install into virtualenv"
   pip:
-    name: "git+https://github.com/ral-facilities/datagateway-api.git"
-    state: latest
+    name: "git+https://github.com/ral-facilities/datagateway-api.git@{{ datagateway_api_version }}"
+    state: present
     virtualenv: "{{ datagateway_api_virtualenv }}"
     virtualenv_python: python3
   notify:
