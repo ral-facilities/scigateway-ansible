@@ -144,7 +144,11 @@
     destination_port: "80"
     jump: ACCEPT
 
-- name: Start apache
+- name: Save iptables rules
+  shell: iptables-save > /etc/sysconfig/iptables
+
+- name: Start apache & ensure it starts on boot
   service:
     name: httpd
     state: started
+    enabled: yes
