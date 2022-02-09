@@ -27,6 +27,13 @@
   register: stringsFileResults
   become: false
 
+- name: "Check facility image existence"
+  local_action: stat path={{ datagateway_facility_image }}
+  register: facilityResult
+  become: false
+  when:
+    - datagateway_facility_image is defined
+
 - name: "Copy *-settings.json files"
   copy:
     src: "{{ item.stat.path }}"
@@ -56,6 +63,16 @@
   when:
     - item.stat.exists is defined
     - item.stat.exists == true
+
+- name: "Copy facility image"
+  copy:
+    src: "{{ datagateway_facility_image }}"
+    dest: /root/datagateway-dataview-{{ datagateway_version }}
+    mode: 0644
+  when:
+   - datagateway_facility_image is defined
+   - facilityResult.stat.exists is defined
+   - facilityResult.stat.exists == true
 
 - name: "Install to Scigateway plugins directory"
   copy:
