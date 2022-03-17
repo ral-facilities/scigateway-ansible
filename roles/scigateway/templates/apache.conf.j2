@@ -43,6 +43,7 @@
     Options FollowSymLinks
     AllowOverride None
     Require all granted
+    {% if datagateway_api_apache_conf is defined %}RewriteRule ^search-api/(.*) /datagateway-api/search-api/$1 [QSA,L]{% endif %}
     # Don't rewrite files or directories
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
@@ -59,6 +60,9 @@
     AllowOverride None
     Require all granted
   </Directory>
+
+  {% if additional_apache_conf is defined %}{{ additional_apache_conf }}{% endif %}
+  
 </VirtualHost>
 
 SSLProtocol             all -SSLv3 -TLSv1 -TLSv1.1

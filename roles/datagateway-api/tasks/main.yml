@@ -96,6 +96,35 @@
   notify:
     - Restart apache
 
+- name: "Check search_api_mapping.json file existence"
+  local_action: stat path={{ search_api_mapping_file }}
+  register: mappingFileResult
+  become: false
+
+- name: "Copy search_api_mapping.json"
+  copy:
+    src: "{{ search_api_mapping_file }}"
+    dest: "{{ datagateway_api_site_packages }}/datagateway_api/search_api_mapping.json"
+    mode: 0644
+  when:
+   - mappingFileResult.stat.exists is defined
+   - mappingFileResult.stat.exists == true
+  notify:
+  - Restart apache
+
+- name: "Create search_api_mapping.json from template"
+  template:
+    src: templates/search_api_mapping.json.j2
+    dest: "{{ datagateway_api_site_packages }}/datagateway_api/search_api_mapping.json"
+    owner: root
+    group: root
+    mode: 0644
+  when:
+   - mappingFileResult.stat.exists is defined
+   - mappingFileResult.stat.exists == false
+  notify:
+    - Restart apache
+
 - name: "Create apache conf fragment from template"
   set_fact:
     datagateway_api_apache_conf: "{{ lookup('template', 'templates/apache.conf.j2') }}"

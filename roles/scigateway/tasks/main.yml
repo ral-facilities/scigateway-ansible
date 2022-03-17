@@ -49,6 +49,34 @@
   when:
     - scigateway_logo is defined
 
+- name: "Check nav drawer light mode logo existence"
+  local_action: stat path={{ scigateway_nav_logo_light }}
+  register: navLogoLightResult
+  become: false
+  when:
+    - scigateway_nav_logo_light is defined
+
+- name: "Check nav drawer dark mode logo existence"
+  local_action: stat path={{ scigateway_nav_logo_dark }}
+  register: navLogoDarkResult
+  become: false
+  when:
+    - scigateway_nav_logo_dark is defined
+
+- name: "Check help images folder existence"
+  local_action: stat path={{ scigateway_help_images }}
+  register: helpImagesResult
+  become: false
+  when:
+    - scigateway_help_images is defined
+
+- name: "Check additional apache config template existence"
+  local_action: stat path={{ additional_apache_conf }}
+  register: additionalApacheConfResult
+  become: false
+  when:
+    - additional_apache_conf is defined
+
 - name: "Copy settings.json"
   copy:
     src: "{{ scigateway_settings_file }}"
@@ -66,12 +94,6 @@
   when:
    - settingsFileResult.stat.exists is defined
    - settingsFileResult.stat.exists == false
-
-- name: "Edit settings.json to allow for cache busting of plugins"
-  replace:
-    path: /root/scigateway-{{ scigateway_version }}/settings.json
-    regexp: '(^\s*"src": *".*)(\.js",\s?)'
-    replace: '\1.{{ansible_date_time.epoch}}\2'
 
 - name: "Copy default.json"
   copy:
@@ -110,6 +132,36 @@
    - logoResult.stat.exists is defined
    - logoResult.stat.exists == true
 
+- name: "Copy light nav logo"
+  copy:
+    src: "{{ scigateway_nav_logo_light }}"
+    dest: /root/scigateway-{{ scigateway_version }}
+    mode: 0644
+  when:
+   - scigateway_nav_logo_light is defined
+   - navLogoLightResult.stat.exists is defined
+   - navLogoLightResult.stat.exists == true
+
+- name: "Copy dark nav logo"
+  copy:
+    src: "{{ scigateway_nav_logo_dark }}"
+    dest: /root/scigateway-{{ scigateway_version }}
+    mode: 0644
+  when:
+   - scigateway_nav_logo_dark is defined
+   - navLogoDarkResult.stat.exists is defined
+   - navLogoDarkResult.stat.exists == true
+
+- name: "Copy help images"
+  copy:
+    src: "{{ scigateway_help_images }}"
+    dest: /root/scigateway-{{ scigateway_version }}/res/images/help/
+    mode: 0644
+  when:
+   - scigateway_help_images is defined
+   - helpImagesResult.stat.exists is defined
+   - helpImagesResult.stat.exists == true
+
 - name: "Edit manifest.json"
   replace:
     path: /root/scigateway-{{ scigateway_version }}/manifest.json
@@ -121,6 +173,14 @@
     src: /root/scigateway-{{ scigateway_version }}/
     dest: "{{ scigateway_dir }}"
     remote_src: yes
+
+- name: "Create apache conf fragment from template"
+  set_fact:
+    additional_apache_conf: "{{ lookup('template', additional_apache_conf) }}"
+  when:
+   - additional_apache_conf is defined
+   - additionalApacheConfResult.stat.exists is defined
+   - additionalApacheConfResult.stat.exists == true
 
 - name: "Create apache conf from template"
   template:

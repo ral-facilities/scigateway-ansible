@@ -81,9 +81,49 @@
     remote_src: yes
   loop: "{{ datagateway_plugins }}"
 
+- name: "Stat main.js files (we need to know modificiation timestamps for cache busting)"
+  stat:
+    path: "{{ scigateway_plugins_dir }}/{{ item }}/main.js"
+  register: mainJsResults
+  loop: "{{ datagateway_plugins }}"
+
+- name: "Find all versions of main.js so we can delete old ones"
+  find:
+    paths: "{{ scigateway_plugins_dir }}/{{ item }}"
+    patterns: "main.[0-9.]*.js"
+  register: toDeleteResult
+  loop: "{{ datagateway_plugins }}"
+
+- name: "Select all but the newest three main.js files"
+  set_fact:
+    files_to_delete: |
+          {{
+            (files_to_delete | default([]))
+            +
+            item[0:-3] 
+          }}
+  loop: "{{ toDeleteResult.results | map(attribute='files') | map('sort', False, False, 'ctime') }}"
+
+- name: "Delete all main.js files except the newest three"
+  file:
+    state: absent
+    path: "{{ item }}"
+  loop: "{{ files_to_delete | map(attribute='path') }}"
+
 - name: "Rename main.js files to enable cache busting"
   copy:
     src: "{{ scigateway_plugins_dir }}/{{ item }}/main.js"
-    dest: "{{ scigateway_plugins_dir }}/{{ item }}/main.{{ansible_date_time.epoch}}.js"
+    dest: "{{ scigateway_plugins_dir }}/{{ item }}/main.{{mainJsResults.results[idx].stat.mtime}}.js"
     remote_src: yes
   loop: "{{ datagateway_plugins }}"
+  loop_control:
+    index_var: idx
+
+- name: "Edit settings.json to allow for cache busting of plugins"
+  replace:
+    path: /root/scigateway-{{ scigateway_version }}/settings.json
+    regexp: '("name": "{{ item }}",\s*^\s*"src": *".*)(\.js",\s?)'
+    replace: '\1.{{mainJsResults.results[idx].stat.mtime}}\2'
+  loop: "{{ datagateway_plugins }}"
+  loop_control:
+    index_var: idx
