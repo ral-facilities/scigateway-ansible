@@ -121,7 +121,7 @@
 
 - name: "Edit settings.json to allow for cache busting of plugins"
   replace:
-    path: /root/scigateway-{{ scigateway_version }}/settings.json
+    path: "{{ scigateway_dir }}/settings.json"
     regexp: '("name": "{{ item }}",\s*^\s*"src": *".*)(\.js",\s?)'
     replace: '\1.{{mainJsResults.results[idx].stat.mtime}}\2'
   loop: "{{ datagateway_plugins }}"
