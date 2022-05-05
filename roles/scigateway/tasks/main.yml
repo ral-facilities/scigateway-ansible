@@ -190,6 +190,24 @@
   notify:
     - Restart apache
 
+- name: Disable apache prefork mpm module
+  lineinfile:
+    path: /etc/httpd/conf.modules.d/00-mpm.conf
+    regexp: '^(LoadModule mpm_prefork_module.*)'
+    line: '#\1'
+    backrefs: yes
+  notify:
+    - Restart apache
+
+- name: Enable apache event mpm module
+  lineinfile:
+    path: /etc/httpd/conf.modules.d/00-mpm.conf
+    regexp: '^#(LoadModule mpm_event_module.*)'
+    line: '\1'
+    backrefs: yes
+  notify:
+    - Restart apache
+
 - name: Open port 443
   ansible.builtin.iptables:
     chain: INPUT

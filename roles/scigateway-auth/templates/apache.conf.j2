@@ -1,5 +1,5 @@
     WSGIProcessGroup scigateway-auth
-    WSGIDaemonProcess scigateway-auth user={{ scigateway_auth_user }} group={{ scigateway_auth_group }} threads=1 python-home={{ scigateway_auth_virtualenv }}
+    WSGIDaemonProcess scigateway-auth user={{ scigateway_auth_user }} group={{ scigateway_auth_group }} processes=2 python-home={{ scigateway_auth_virtualenv }}
     WSGIScriptAlias /api {{ scigateway_auth_site_packages }}/scigateway_auth/wsgi.py process-group=scigateway-auth
 
     <Directory {{ scigateway_auth_site_packages }}/scigateway_auth>
