@@ -16,7 +16,7 @@
   get_url:
     url: "https://github.com/ral-facilities/scigateway/releases/download/{{ scigateway_version }}/scigateway-{{ scigateway_version }}.tar.gz"
     dest: /root/scigateway-{{ scigateway_version }}.tar.gz
-    force: "{{ scigateway_version == 'snapshot' }}"
+    force: "{{ scigateway_version == 'snapshot' or scigateway_version == 'snapshot-develop' }}"
 
 - name: "Unarchive"
   unarchive:

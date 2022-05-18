@@ -4,7 +4,7 @@
   get_url:
     url: "https://github.com/ral-facilities/datagateway/releases/download/{{ datagateway_version }}/{{ item }}-{{ datagateway_version }}.tar.gz"
     dest: /root/{{ item }}-{{ datagateway_version }}.tar.gz
-    force: "{{ datagateway_version == 'snapshot' }}"
+    force: "{{ datagateway_version == 'snapshot' or datagateway_version == 'snapshot-develop' }}"
   loop: "{{ datagateway_plugins }}"
 
 - name: "Unarchive"
