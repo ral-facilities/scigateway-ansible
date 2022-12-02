@@ -1,0 +1,16 @@
+---
+datagateway_api:
+  extension: "/"
+  backend: "python_icat"
+  client_cache_size: 50
+  client_pool_init_size: 20
+  client_pool_max_size: 50
+  icat_url: "{{ datagateway_api_icat_url }}"
+  icat_check_cert: true
+flask_reloader: false
+log_level: "DEBUG"
+log_location: "{{ datagateway_api_log }}/logs.log"
+debug_mode: false
+generate_swagger: false
+host: "127.0.0.1"
+port: "5000"

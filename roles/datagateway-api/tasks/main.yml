@@ -67,15 +67,15 @@
   set_fact:
     datagateway_api_site_packages: "{{ reg.stdout }}"
 
-- name: "Check config.json file existence"
+- name: "Check config.yaml file existence"
   local_action: stat path={{ datagateway_api_config_file }}
   register: configFileResult
   become: false
 
-- name: "Copy config.json"
+- name: "Copy config.yaml"
   copy:
     src: "{{ datagateway_api_config_file }}"
-    dest: "{{ datagateway_api_site_packages }}/datagateway_api/config.json"
+    dest: "{{ datagateway_api_site_packages }}/datagateway_api/config.yaml"
     mode: 0644
   when:
    - configFileResult.stat.exists is defined
@@ -83,10 +83,10 @@
   notify:
   - Restart apache
 
-- name: "Create config.json from template"
+- name: "Create config.yaml from template"
   template:
-    src: templates/config.json.j2
-    dest: "{{ datagateway_api_site_packages }}/datagateway_api/config.json"
+    src: templates/config.yaml.j2
+    dest: "{{ datagateway_api_site_packages }}/datagateway_api/config.yaml"
     owner: root
     group: root
     mode: 0644
