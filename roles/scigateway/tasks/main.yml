@@ -1,5 +1,38 @@
 ---
 
+- name: Allow apache to access files in scigateway_dir and scigateway_plugins_dir
+  community.general.sefcontext:
+    target: '{{ item }}(/.*)?'
+    setype: httpd_sys_content_t
+    state: present
+    reload: True
+  register: filecontext
+  with_items:
+  - "{{ scigateway_dir }}"
+  - "{{ scigateway_plugins_dir }}"
+  when: ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled'
+
+- name: Apply new SELinux file contexts
+  ansible.builtin.command: restorecon -Rv {{ item.target }}
+  with_items:
+  - { index: 0, target: "{{ scigateway_dir }}" }
+  - { index: 1, target: "{{ scigateway_plugins_dir }}" }
+  when: ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled' and filecontext.results[item.index] is changed
+
+- name: Set httpd_can_network_connect flag on and keep it persistent across reboots
+  ansible.posix.seboolean:
+    name: httpd_can_network_connect
+    state: true
+    persistent: true
+  when: ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled'
+
+- name: Set allow_httpd_anon_write flag on and keep it persistent across reboots
+  ansible.posix.seboolean:
+    name: allow_httpd_anon_write
+    state: true
+    persistent: true
+  when: ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled'
+
 - name: "Create install directory"
   file:
     path: "{{ scigateway_dir }}"
@@ -208,14 +241,14 @@
   notify:
     - Restart apache
 
-- name: Open port 443
+- name: Open port 443 (iptables)
   ansible.builtin.iptables:
     chain: INPUT
     protocol: tcp
     destination_port: "443"
     jump: ACCEPT
 
-- name: Open port 80
+- name: Open port 80 (iptables)
   ansible.builtin.iptables:
     chain: INPUT
     protocol: tcp
@@ -224,6 +257,20 @@
 
 - name: Save iptables rules
   shell: iptables-save > /etc/sysconfig/iptables
+
+- name: Open port 443 (firewalld)
+  ansible.posix.firewalld:
+    service: https
+    permanent: true
+    immediate: true
+    state: enabled
+
+- name: Open port 80 (firewalld)
+  ansible.posix.firewalld:
+    service: http
+    permanent: true
+    immediate: true
+    state: enabled
 
 - name: Start apache & ensure it starts on boot
   service:
