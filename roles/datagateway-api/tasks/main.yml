@@ -9,7 +9,7 @@
   register: filecontext
   with_items:
   - { target: "{{ datagateway_api_home }}", setype: "usr_t" }
-  - { target: "{{ datagateway_api_log }}", setype: "httpd_log_t" }
+  - { target: "{{ datagateway_api_log }}", setype: "httpd_sys_rw_content_t" }
   when: ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled'
 
 - name: Apply new SELinux file contexts
