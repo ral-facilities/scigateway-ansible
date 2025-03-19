@@ -7,6 +7,8 @@
 </VirtualHost>
 
 <VirtualHost *:443>
+  Protocols h2 h2c http/1.1
+
   SSLEngine On
   SSLCertificateFile {{ scigateway_certificate_file }}
   SSLCertificateChainFile {{ scigateway_certificate_bundle_file if scigateway_certificate_bundle_file is defined and scigateway_certificate_bundle_file|length else scigateway_certificate_file }}
