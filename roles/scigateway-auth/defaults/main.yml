@@ -7,3 +7,4 @@ scigateway_auth_log: /var/log/scigateway-auth
 scigateway_auth_virtualenv: /opt/scigateway-auth
 scigateway_auth_icat_url: "{{ icat_url | default('https://example.com') }}/icat"
 scigateway_auth_config_file: ""
+scigateway_auth_version: "main"

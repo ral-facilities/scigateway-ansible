@@ -12,13 +12,6 @@
   - "{{ scigateway_plugins_dir }}"
   when: ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled'
 
-- name: Apply new SELinux file contexts
-  ansible.builtin.command: restorecon -Rv {{ item.target }}
-  with_items:
-  - { index: 0, target: "{{ scigateway_dir }}" }
-  - { index: 1, target: "{{ scigateway_plugins_dir }}" }
-  when: ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled' and filecontext.results[item.index] is changed
-
 - name: Set httpd_can_network_connect flag on and keep it persistent across reboots
   ansible.posix.seboolean:
     name: httpd_can_network_connect
@@ -142,7 +135,7 @@
     path: /root/scigateway-{{ scigateway_version }}/index.html
     after: '<title>'
     before: '</title>'
-    regexp: '.*'
+    regexp: '.+'
     replace: "{{ scigateway_title }}"
 
 - name: "Replace favicon"
@@ -277,3 +270,10 @@
     name: httpd
     state: started
     enabled: yes
+
+- name: Apply new SELinux file contexts
+  ansible.builtin.command: restorecon -Rv {{ item.target }}
+  with_items:
+  - { index: 0, target: "{{ scigateway_dir }}" }
+  - { index: 1, target: "{{ scigateway_plugins_dir }}" }
+  when: ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled' and filecontext.results[item.index] is changed

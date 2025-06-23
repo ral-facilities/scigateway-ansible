@@ -12,13 +12,6 @@
   - { target: "{{ scigateway_auth_log }}", setype: "httpd_sys_rw_content_t" }
   when: ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled'
 
-- name: Apply new SELinux file contexts
-  ansible.builtin.command: restorecon -Rv {{ item.target }}
-  with_items:
-  - { index: 0, target: "{{ scigateway_auth_home }}" }
-  - { index: 1, target: "{{ scigateway_auth_log }}" }
-  when: ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled' and filecontext.results[item.index] is changed
-
 - name: "Create group"
   group:
     name: "{{ scigateway_auth_group }}"
@@ -104,8 +97,8 @@
 
 - name: "Install into virtualenv"
   pip:
-    name: "git+https://github.com/ral-facilities/scigateway-auth.git"
-    state: latest
+    name: "git+https://github.com/ral-facilities/scigateway-auth.git@{{ scigateway_auth_version }}"
+    state: forcereinstall
     virtualenv: "{{ scigateway_auth_virtualenv }}"
     virtualenv_python: python3
   notify:
@@ -151,3 +144,10 @@
 - name: "Create apache conf fragment from template"
   set_fact:
     scigateway_auth_apache_conf: "{{ lookup('template', 'templates/apache.conf.j2') }}"
+
+- name: Apply new SELinux file contexts
+  ansible.builtin.command: restorecon -Rv {{ item.target }}
+  with_items:
+  - { index: 0, target: "{{ scigateway_auth_home }}" }
+  - { index: 1, target: "{{ scigateway_auth_log }}" }
+  when: ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled' and filecontext.results[item.index] is changed
