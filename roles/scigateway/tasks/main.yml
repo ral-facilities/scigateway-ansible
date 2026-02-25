@@ -26,6 +26,12 @@
     persistent: true
   when: ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled'
 
+- name: Install tar package
+  package:
+    name:
+      - tar
+    state: present
+
 - name: "Create install directory"
   file:
     path: "{{ scigateway_dir }}"

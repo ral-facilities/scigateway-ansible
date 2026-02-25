@@ -1,5 +1,11 @@
 ---
 
+- name: Install tar package
+  package:
+    name:
+      - tar
+    state: present
+
 - name: "Download"
   get_url:
     url: "https://github.com/ral-facilities/datagateway/releases/download/{{ datagateway_version }}/{{ item }}-{{ datagateway_version }}.tar.gz"

@@ -1,4 +1,5 @@
 {
   "show": false,
+  "severity": "warning",
   "message": "Maintenance scheduled for tomorrow at 12:00"
 }
